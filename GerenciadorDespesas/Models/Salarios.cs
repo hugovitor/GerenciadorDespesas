@@ -10,12 +10,13 @@ namespace GerenciadorDespesas.Models
     {
         public int SalarioId { get; set; }
 
+        #region propriedades navegacionais e chave estrangeira
         public int MesId { get; set; }
-
         public Meses Meses { get; set; }
+        #endregion
 
         [Required(ErrorMessage = "Campo obrigatório.")]
-        [Range(0, double.MaxValue, ErrorMessage ="Valor inválido.")]
+        [Range(0, double.MaxValue, ErrorMessage = "Valor inválido.")]
         public double Valor { get; set; }
     }
 }
