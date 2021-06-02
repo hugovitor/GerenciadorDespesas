@@ -11,9 +11,9 @@
             <a asp-action="Create" class="btn btn-outline-primary btn-sm">Novo tipo de despesa</a>
         </p>
 
-        @if (TempData["Confirmacao"] != null)
+        @if (TempData["confirmacao"] != null)
         {
-            <h6 class="alert alert-success">@TempData["Confirmacao"]</h6>
+            <h6 class="alert alert-success">@TempData["confirmacao"]</h6>
         }
 
         <form asp-action="Index" asp-controller="TipoDespesas" method="post">
@@ -47,7 +47,10 @@
                         </td>
                         <td>
                             <a asp-action="Edit" asp-route-id="@item.TipoDespesaId" class="btn btn-outline-info btn-sm">Atualizar</a> |
-                            <a class="btn btn-outline-danger btn-sm" onclick="ExibirModal(@item.TipoDespesaId, '@item.Nome')">Excluir</a>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="ExibirModal(@item.TipoDespesaId, '@item.Nome')">
+                                Excluir
+                            </button>
+
                         </td>
                     </tr>
                 }
@@ -56,42 +59,44 @@
     </div>
 </div>
 
-<div class="modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Excluir</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>Deseja prosseguir com a exclusão de <text class="nome"></text></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-primary btnExcluir">Sim</button>
-                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Não</button>
+                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Não</button>
             </div>
         </div>
     </div>
 </div>
 
+
 @section Scripts{
     <script>
         function ExibirModal(id, nome) {
             $(".nome")[0].innerHTML = nome;
-            $(".modal").modal();
+            $(".modal").show();
             $(".btnExcluir").on('click', function () {
                 $.ajax({
                     url: "TipoDespesas/Delete",
                     method: "POST",
                     data: { id: id },
                     success: function (data) {
-                        $(".modal").modal('hide');
+                        $(".modal").hide();
                         location.reload(true);
                     }
                 });
             });
         }
+
+
     </script>
 }

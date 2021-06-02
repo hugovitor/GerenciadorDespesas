@@ -76,7 +76,7 @@ namespace GerenciadorDespesas.Controllers
             if (ModelState.IsValid)
             {
 
-                TempData["Confirmacao"] = tipoDespesas.Nome + " foi cadastrado com sucesso.";
+                TempData["confirmacao"] = tipoDespesas.Nome + " foi cadastrado com sucesso.";
 
                 _context.Add(tipoDespesas);
                 await _context.SaveChangesAsync();
@@ -115,7 +115,7 @@ namespace GerenciadorDespesas.Controllers
             {
                 try
                 {
-                    TempData["Confirmacao"] = tipoDespesas.Nome + " foi atualizado com sucesso.";
+                    TempData["confirmacao"] = tipoDespesas.Nome + " foi atualizado com sucesso.";
                     _context.Update(tipoDespesas);
                     await _context.SaveChangesAsync();
                 }
@@ -141,7 +141,7 @@ namespace GerenciadorDespesas.Controllers
         public async Task<JsonResult> Delete(int id)
         {
             var tipoDespesas = await _context.TipoDespesas.FindAsync(id);
-            TempData["Confirmacao"] = tipoDespesas.Nome + " foi excluido com sucesso.";
+            TempData["confirmacao"] = tipoDespesas.Nome + " foi excluido com sucesso.";
             _context.TipoDespesas.Remove(tipoDespesas);
             await _context.SaveChangesAsync();
             return Json(tipoDespesas.Nome + " excluído com sucesso.");
