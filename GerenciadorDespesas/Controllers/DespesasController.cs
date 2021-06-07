@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GerenciadorDespesas.Models;
 using X.PagedList;
+using GerenciadorDespesas.ViewModels;
 
 namespace GerenciadorDespesas.Controllers
 {
@@ -24,6 +25,9 @@ namespace GerenciadorDespesas.Controllers
         {
             const int itensPagina = 10;
             int numeroPagina = (pagina ?? 1);
+
+            ViewData["Meses"] = new SelectList(_context.Meses.Where(x => x.MesId == x.Salarios.MesId), "MesId", "Nome");
+
             var contexto = _context.Despesas.Include(d => d.Meses).Include(d => d.TipoDespesas).OrderBy(d => d.MesId);
             return View(await contexto.ToPagedListAsync(numeroPagina, itensPagina));
         }
@@ -124,6 +128,17 @@ namespace GerenciadorDespesas.Controllers
         private bool DespesasExists(int id)
         {
             return _context.Despesas.Any(e => e.DespesaId == id);
+        }
+
+
+        public JsonResult GastoTotaisMes(int mesId)
+        {
+            GastoTotaisMesViewModel gastos = new GastoTotaisMesViewModel();
+
+            gastos.ValorTotalGasto = _context.Despesas.Where(d => d.Meses.MesId == mesId).Sum(d => d.Valor);
+            gastos.Salario = _context.Salarios.Where(s => s.Meses.MesId == mesId).Select(s => s.Valor).FirstOrDefault();
+
+            return Json(gastos);
         }
     }
 }
