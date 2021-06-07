@@ -28,7 +28,23 @@
 
         <div class="row">
             <div class="col">
-                <partial name="_GastoTotalMes"/>
+                <partial name="_GastoTotalMes" />
+            </div>
+
+            <div class="col">
+                <partial name="_GastoMes" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <partial name="_GastosTotais" />
+            </div>
+        </div>
+
+        <div class="estatisticas">
+            <div class="alert alert-primary">
+                @await Component.InvokeAsync("Estatisticas")
             </div>
         </div>
 
@@ -103,10 +119,17 @@
 
 
 @section Scripts{
+
+    <script src="~/js/MetodosGerais.js"></script>
+    <script src="~/js/GraficoGastoMes.js"></script>
     <script src="~/js/GraficoTotalMes.js"></script>
+    <script src="~/js/GraficoGastosTotaisMes.js"></script>
+    
     <script>
 
-        CarregarGastosTotaisMes();
+        CarregarDadosGastosMes();
+        CarregarDadosGastosTotaisMes();
+        CarregarDadosGastosTotais();
 
         function ExibirModal(id) {
             $(".modal").modal();

@@ -15,12 +15,15 @@ namespace GerenciadorDespesas.Controllers
     {
         private readonly Contexto _context;
 
+        #region Construtor
         public DespesasController(Contexto context)
         {
             _context = context;
         }
+        #endregion
 
-        // GET: Despesas
+
+        #region Index
         public async Task<IActionResult> Index(int? pagina)
         {
             const int itensPagina = 10;
@@ -31,8 +34,9 @@ namespace GerenciadorDespesas.Controllers
             var contexto = _context.Despesas.Include(d => d.Meses).Include(d => d.TipoDespesas).OrderBy(d => d.MesId);
             return View(await contexto.ToPagedListAsync(numeroPagina, itensPagina));
         }
+        #endregion
 
-        // GET: Despesas/Create
+        #region create
         public IActionResult Create()
         {
             ViewData["MesId"] = new SelectList(_context.Meses, "MesId", "Nome");
@@ -40,9 +44,6 @@ namespace GerenciadorDespesas.Controllers
             return View();
         }
 
-        // POST: Despesas/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DespesaId,MesId,TipoDespesaId,Valor")] Despesas despesas)
@@ -50,6 +51,7 @@ namespace GerenciadorDespesas.Controllers
             if (ModelState.IsValid)
             {
                 TempData["Confirmacao"] = "Despesa cadastrada com sucesso.";
+
                 _context.Add(despesas);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -58,8 +60,9 @@ namespace GerenciadorDespesas.Controllers
             ViewData["TipoDespesaId"] = new SelectList(_context.TipoDespesas, "TipoDespesaId", "Nome", despesas.TipoDespesaId);
             return View(despesas);
         }
+        #endregion
 
-        // GET: Despesas/Edit/5
+        #region edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,9 +80,6 @@ namespace GerenciadorDespesas.Controllers
             return View(despesas);
         }
 
-        // POST: Despesas/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("DespesaId,MesId,TipoDespesaId,Valor")] Despesas despesas)
@@ -93,7 +93,7 @@ namespace GerenciadorDespesas.Controllers
             {
                 try
                 {
-                    TempData["Confirmacao"] = "Despesa atualizado com sucesso.";
+                    TempData["Confirmacao"] = "Despesa atualizada com sucesso.";
                     _context.Update(despesas);
                     await _context.SaveChangesAsync();
                 }
@@ -114,8 +114,10 @@ namespace GerenciadorDespesas.Controllers
             ViewData["TipoDespesaId"] = new SelectList(_context.TipoDespesas, "TipoDespesaId", "Nome", despesas.TipoDespesaId);
             return View(despesas);
         }
+        #endregion
 
-        // POST: Despesas/Delete/5
+
+        #region delete
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -124,21 +126,47 @@ namespace GerenciadorDespesas.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
         private bool DespesasExists(int id)
         {
             return _context.Despesas.Any(e => e.DespesaId == id);
         }
 
-
-        public JsonResult GastoTotaisMes(int mesId)
+        #region métodos para gráficos
+        public JsonResult GastosTotaisMes(int mesId)
         {
-            GastoTotaisMesViewModel gastos = new GastoTotaisMesViewModel();
+            GastosTotaisMesViewModel gastos = new GastosTotaisMesViewModel();
 
             gastos.ValorTotalGasto = _context.Despesas.Where(d => d.Meses.MesId == mesId).Sum(d => d.Valor);
             gastos.Salario = _context.Salarios.Where(s => s.Meses.MesId == mesId).Select(s => s.Valor).FirstOrDefault();
 
             return Json(gastos);
         }
+
+        public JsonResult GastoMes(int mesId)
+        {
+            var query = from despesas in _context.Despesas
+                        where despesas.Meses.MesId == mesId
+                        group despesas by despesas.TipoDespesas.Nome into g
+                        select new
+                        {
+                            TiposDespesas = g.Key,
+                            Valores = g.Sum(d => d.Valor)
+                        };
+
+            return Json(query);
+        }
+
+        public JsonResult GastosTotais()
+        {
+            var query = _context.Despesas
+                .OrderBy(m => m.Meses.MesId)
+                .GroupBy(m => m.Meses.MesId)
+                .Select(d => new { NomeMeses = d.Select(x => x.Meses.Nome).Distinct(), Valores = d.Sum(x => x.Valor) });
+
+            return Json(query);
+        }
+        #endregion
     }
 }

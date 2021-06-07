@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace GerenciadorDespesas.ViewModels
 {
-    public class GastoTotaisMesViewModel
+    public class GastosTotaisMesViewModel
     {
         public double ValorTotalGasto { get; set; }
+
         public double Salario { get; set; }
     }
 }

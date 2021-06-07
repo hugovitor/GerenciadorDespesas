@@ -2,18 +2,21 @@
     var mesId = $(".escolhaMes").val();
 
     $.ajax({
-        url: "Despesas/GastoTotaisMes",
+        url: "Despesas/GastosTotaisMes",
+        method: "POST",
         data: { mesId: mesId },
         success: function (dados) {
             $("canvas#GraficoGastoTotalMes").remove();
-            $("div.GraficoGastoTotalMes").append('<canvas id="GraficoGastoTotalMes" style="height:400px;  width:400px;"></canvas>');
+            $("div.GraficoGastoTotalMes").append('<canvas id="GraficoGastoTotalMes" style="height:400px;width:400px;"></canvas>');
 
             var ctx = document.getElementById('GraficoGastoTotalMes').getContext('2d');
 
             var grafico = new Chart(ctx, {
                 type: 'doughnut',
-                data: {
-                    labels: ["Restante", "Total gasto"],
+
+                data:
+                {
+                    labels: ['Restante', 'Total gasto'],
                     datasets: [
                         {
                             label: "Total gasto",
@@ -29,26 +32,30 @@
                         text: "Total gasto no Mês"
                     }
                 }
-            })
+            });
         }
-    }); 
+    });
 });
 
- function CarregarGastosTotaisMes() {
+
+function CarregarDadosGastosTotaisMes() {
 
     $.ajax({
-        url: "Despesas/GastoTotaisMes",
+        url: "Despesas/GastosTotaisMes",
+        method: "POST",
         data: { mesId: 1 },
         success: function (dados) {
             $("canvas#GraficoGastoTotalMes").remove();
-            $("div.GraficoGastoTotalMes").append('<canvas id="GraficoGastoTotalMes" style="height:400px;  width:400px;"></canvas>');
+            $("div.GraficoGastoTotalMes").append('<canvas id="GraficoGastoTotalMes" style="height:400px;width:400px;"></canvas>');
 
             var ctx = document.getElementById('GraficoGastoTotalMes').getContext('2d');
 
             var grafico = new Chart(ctx, {
                 type: 'doughnut',
-                data: {
-                    labels: ["Restante", "Total gasto"],
+
+                data:
+                {
+                    labels: ['Restante', 'Total gasto'],
                     datasets: [
                         {
                             label: "Total gasto",
@@ -64,7 +71,7 @@
                         text: "Total gasto no Mês"
                     }
                 }
-            })
+            });
         }
     });
-};
+}

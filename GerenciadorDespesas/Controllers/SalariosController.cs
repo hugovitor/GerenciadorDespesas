@@ -13,11 +13,14 @@ namespace GerenciadorDespesas.Controllers
     {
         private readonly Contexto _context;
 
+        #region construtor
         public SalariosController(Contexto context)
         {
             _context = context;
         }
+        #endregion
 
+        #region index
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -30,30 +33,27 @@ namespace GerenciadorDespesas.Controllers
         {
             if (!String.IsNullOrEmpty(txtProcurar))
             {
-                return View(await _context.Salarios.Include(s => s.Meses).Where(m => m.Meses.Nome.ToUpper().Contains(txtProcurar.ToUpper())).ToArrayAsync());
+                return View(await _context.Salarios.Include(s => s.Meses).Where(m => m.Meses.Nome.ToUpper().Contains(txtProcurar.ToUpper())).ToListAsync());
             }
 
             return View(await _context.Salarios.Include(s => s.Meses).ToListAsync());
         }
-        
+        #endregion
 
-        // GET: Salarios/Create
+        #region create
         public IActionResult Create()
         {
             ViewData["MesId"] = new SelectList(_context.Meses.Where(s => s.MesId != s.Salarios.MesId), "MesId", "Nome");
             return View();
         }
 
-        // POST: Salarios/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("SalarioId,MesId,Valor")] Salarios salarios)
         {
             if (ModelState.IsValid)
             {
-                TempData["confirmacao"] = "Salário cadastrado com sucesso.";
+                TempData["Confirmacao"] = "Salário cadastrado com sucesso.";
                 _context.Add(salarios);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -61,8 +61,9 @@ namespace GerenciadorDespesas.Controllers
             ViewData["MesId"] = new SelectList(_context.Meses.Where(s => s.MesId != s.Salarios.MesId), "MesId", "Nome", salarios.MesId);
             return View(salarios);
         }
+        #endregion
 
-        // GET: Salarios/Edit/5
+        #region edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,9 +80,6 @@ namespace GerenciadorDespesas.Controllers
             return View(salarios);
         }
 
-        // POST: Salarios/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SalarioId,MesId,Valor")] Salarios salarios)
@@ -97,7 +95,7 @@ namespace GerenciadorDespesas.Controllers
                 {
                     _context.Update(salarios);
                     await _context.SaveChangesAsync();
-                    TempData["confirmacao"] = "Salário atualizado com sucesso.";
+                    TempData["Confirmacao"] = "Salário atualizado com sucesso.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -115,10 +113,9 @@ namespace GerenciadorDespesas.Controllers
             ViewData["MesId"] = new SelectList(_context.Meses.Where(s => s.MesId == salarios.MesId), "MesId", "Nome", salarios.MesId);
             return View(salarios);
         }
+        #endregion
 
-      
-
-        
+        #region delete
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -127,6 +124,7 @@ namespace GerenciadorDespesas.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
         private bool SalariosExists(int id)
         {
