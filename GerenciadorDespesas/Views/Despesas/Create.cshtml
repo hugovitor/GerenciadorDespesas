@@ -17,7 +17,15 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="TipoDespesaId" class="control-label">Tipo da Despesa</label>
-                    <select asp-for="TipoDespesaId" class="form-control" asp-items="ViewBag.TipoDespesaId"></select>
+                    <div class="input-group">
+                        <select asp-for="TipoDespesaId" class="form-control" asp-items="ViewBag.TipoDespesaId"></select>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#exampleModal" data-toggle="tooltip" data-placement="right" 
+                                    title="Adicionar novo tipo de despesa" onclick="MostrarModal()">
+                                <i class="far fa-plus-square"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label asp-for="Valor" class="control-label"></label>
@@ -26,12 +34,64 @@
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Salvar" class="btn btn-outline-success btn-sm" /> &nbsp;
-                    <a asp-action="Index"  class="btn btn-outline-dark btn-sm">Voltar</a>
+                    <a asp-action="Index" class="btn btn-outline-dark btn-sm">Voltar</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar nova despesa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input class="form-control txtDespesa"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary btnAdicionar">Adicionar</button>
+                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        })
+
+        function MostrarModal() {
+            $(".modal").modal();
+            $(".btnAdicionar").on('click', function () {
+                var txtDespesa = $(".txtDespesa").val();
+                $.ajax({
+                    url: "/TipoDespesas/AdicionarTipoDespesa",
+                    method: "POST",
+                    data: { txtDespesa: txtDespesa },
+                    success: function(data){
+                        if (!data) {
+                            $(".modal").modal('hide');
+                            $(".modal").modal('dispose');
+                            $(".btnAdicionar").unbind('click');
+                            $(".txtDespesa").val('');
+                            alert("Tipo de despesa já cadastrado.");
+                        } else {
+                            location.reload(true);
+                        }
+                    }
+                })
+            })
+        }
+    </script>
 }
