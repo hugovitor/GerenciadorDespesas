@@ -1,0 +1,107 @@
+﻿@model X.PagedList.IPagedList<GerenciadorDespesas.Models.Despesas>
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+
+@{
+    ViewData["Title"] = "Despesas cadastradas";
+}
+
+<div class="tabela">
+    <div class="container">
+        <p class="btnNovo">
+            <a asp-action="Create" class="btn btn-outline-primary btn-sm">Nova Despesa</a>
+        </p>
+
+        @if (TempData["Confirmacao"] != null)
+        {
+            <h6 class="alert alert-success">@TempData["Confirmacao"]</h6>
+        }
+
+        <div class="tabelaPrincipal">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            Meses
+                        </th>
+                        <th>
+                            Tipo Despesa
+                        </th>
+                        <th>
+                            Valor
+                        </th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Meses.Nome)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TipoDespesas.Nome)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Valor)
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.DespesaId" class="btn btn-outline-info btn-sm">Atualizar</a> |
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="ExibirModal(@item.DespesaId)">
+                                    Excluir
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@Html.PagedListPager(Model, pagina => Url.Action("Index", "Despesas", new { pagina }), new PagedListRenderOptionsBase
+{
+    LiElementClasses = new string[] {"page-item"},
+    PageClasses = new string[] { "page-link"}
+})
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Excluir</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja prosseguir com a exclusão dessa despesa ?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary btnExcluir">Sim</button>
+                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Não</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script>
+        function ExibirModal(id) {
+            $(".modal").modal();
+            $(".btnExcluir").on('click', function () {
+                $.ajax({
+                    url: "Despesas/Delete",
+                    method: "POST",
+                    data: { id: id },
+                    success: function (data) {
+                        $(".modal").modal('hide');
+                        location.reload(true);
+                    }
+                });
+            });
+        }
+    </script>
+}
